@@ -1,0 +1,69 @@
+//TrainSchedule.js
+import React, { useEffect, useState } from 'react';
+
+const TrainSched = () => {
+  const [trains, setTrains] = useState([]);
+
+  useEffect(() => {
+   
+    const fetchTrainSched = async () => {
+      try {
+        
+        const response = await fetch('http://104.211.219.98/train/register');
+        const data = await response.json();
+        setTrains(data);
+      } catch (error) {
+        console.error('Error fetching train schedule:', error);
+      }
+    };
+
+    fetchTrainSched();
+  }, []);
+
+  return (
+    <div>
+      <h2>Train Schedule</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Train</th>
+            <th>Departure Time</th>
+            <th>Seat Availability</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {trains
+            .filter(train => train.departureTime > Date.now() + 30 * 60 * 1000)
+            .sort((a, b) => a.price - b.price || b.departureTime - a.departureTime)
+            .map(train => (
+              <tr key={train.id}>
+                <td>{train.name}</td>
+                <td>{train.departureTime}</td>
+                <td>{train.seatAvailability}</td>
+                <td>{train.price}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default TrainSched;
+
+
+//index.js
+import React from 'react';
+import TrainSched from './TrainSched';
+
+const App = () => {
+  return (
+    <div>
+      <h1>Train Schedule App</h1>
+      <TrainSched />
+    </div>
+  );
+};
+
+export default App;
